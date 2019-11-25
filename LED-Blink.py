@@ -14,17 +14,20 @@ except:
 
 value = 0
 LED = 13
+E1 = 4
+M1 = 5 #For the wheel
+E2 = 7
+M2 = 6 #For the wheel
 
 a.pinMode(LED,a.OUTPUT)
 
 try:
     while True:
         if value <= 3 :
-            a.digitalWrite(LED, a.HIGH)
+            a.digitalWrite(M1, a.LOW)
+            a.digitalWrite(M2, a.LOW)
             sleep(0.8)
-            a.digitalWrite(LED, a.LOW)
-            sleep(0.8)
-            value=value+0.1
+            value=value+1
         else :
             break
         

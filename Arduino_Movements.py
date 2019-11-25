@@ -34,29 +34,43 @@ Setup the pin location since Arduino doesn't really understand unless we specify
 Name of the component =  Number/position of pin
 '''
 
-E1 = 4
-M1 = 5 #For the wheel
-E2 = 7
-M2 = 6 #For the wheel
+E1 = 5 #4
+M1 = 4 #For the wheel  #5
+E2 = 6 #7
+M2 = 7 #For the wheel #6
 LED = 13
 
 a.pinMode(M1, a.OUTPUT)
 a.pinMode(M2, a.OUTPUT)
 a.pinMode(LED, a.OUTPUT)
+a.pinMode(E1, a.OUTPUT)
+a.pinMode(E2, a.OUTPUT)
 
 ## This part of the function is for wheel movement
 def Movements (score, classes):
     try:
         while True:
-            if (score >= 0.50 and classes == 87):
-                print("\nObject detected, stop!\n")
+            if (score >= 0.50 and classes == 77):
+                print("\nPerson detected, stop!\n")
                 a.digitalWrite(M1, a.LOW) # High = gerak, LOW = stop
                 a.digitalWrite(M2, a.LOW)
+                a.analogWrite(E1, 0)
+                a.analogWrite(E2,0)
+                break
+            elif (score >= 0.50 and classes == 75):
+                print("\nPerson detected, stop!\n")
+                a.digitalWrite(M1, a.LOW) # High = gerak, LOW = stop
+                a.digitalWrite(M2, a.LOW)
+                a.analogWrite(E1, 0)
+                a.analogWrite(E2,0)
                 break
             else:
-                print("\nNo object is detected : Continue\n")
+                print("\nNo person is detected : Continue\n")
                 a.digitalWrite(M1, a.HIGH)  # High = gerak, LOW = stop
                 a.digitalWrite(M2, a.HIGH)
+                a.analogWrite(E1,80)
+                a.analogWrite(E2,220)
+                
                 break
     except:
         a.digitalWrite(M1, a.LOW)
@@ -65,13 +79,11 @@ def Movements (score, classes):
 
 ## This part of the function is for LED blink
 ## Currently optional (or for testing)
-## We can separate this if-else into 2 parts if we have multiple object type to detect
 def Blink (score, classes):
     try:
         while True:
-            if (score >= 0.50 and classes == 87): 
-		
-                print("\nObject detected, stop!\n")
+            if (score >= 0.50 and classes == 77):
+                print("\nPerson detected, stop!\n")
 
                 a.digitalWrite(LED, a.LOW)  # High = on, LOW = off
                 sleep(0.05) #in Arduino IDE, this is equivalent to 'delay'
@@ -84,7 +96,7 @@ def Blink (score, classes):
                 break
 
             else:
-                print("\nNo object is detected : Continue\n")
+                print("\nNo person is detected : Continue\n")
                 a.digitalWrite(LED, a.LOW)  # High = gerak, LOW = stop                
                 break
     except:
@@ -95,6 +107,9 @@ def Terminate ():
     try:
         a.digitalWrite(M1, a.LOW)
         a.digitalWrite(M2, a.LOW)
+        a.analogWrite(E1, 0)
+        a.analogWrite(E2,0)
+        
         print("\nProgram is terminated.\n")
         
             
