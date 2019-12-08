@@ -46,63 +46,43 @@ a.pinMode(LED, a.OUTPUT)
 a.pinMode(E1, a.OUTPUT)
 a.pinMode(E2, a.OUTPUT)
 
-
 ## This part of the function is for wheel movement
 def Movements (score, classes, distance):
     try:
         while True:
-            if (score >= 0.50 and classes == 77 and distance < 35):
-                print("\nObstacle detected, stop!\n")
-                Terminate()
+            if (score >= 0.50 and classes == 77 or distance < 30):
+                print("\nPerson detected, stop!\n")
+                a.digitalWrite(M1, a.LOW) # High = gerak, LOW = stop
+                a.digitalWrite(M2, a.LOW)
+                a.analogWrite(E1, 0)
+                a.analogWrite(E2,0)
                 break
-            elif (score >= 0.50 and classes == 75 and distance < 35):
-                print("\nObstacle detected, stop!\n")
-                Terminate()
-                break
-            elif (score >= 0.50 and classes == 76 and distance < 35):
-                print("\nObstacle detected, stop!\n")
-                Terminate()
+            elif (score >= 0.50 and classes == 75 or distance < 30):
+                print("\nPerson detected, stop!\n")
+                a.digitalWrite(M1, a.LOW) # High = gerak, LOW = stop
+                a.digitalWrite(M2, a.LOW)
+                a.analogWrite(E1, 0)
+                a.analogWrite(E2,0)
                 break
             else:
-                print("\nNo obstacle is detected : Continue\n")
-                Start()
+                print("\nNo person is detected : Continue\n")
+                a.digitalWrite(M1, a.HIGH)  # High = gerak, LOW = stop
+                a.digitalWrite(M2, a.HIGH)
+                a.analogWrite(E1,180)
+                a.analogWrite(E2,200) 
                 break
     except:
         a.digitalWrite(M1, a.LOW)
         a.digitalWrite(M2, a.LOW)
-        #print("\nWaiting for start instruction.\n")
+        print("\nOops. Something went wrong. The robot will be stopped to avoid damages.\n")
 
 ## This part of the function is for LED blink
 ## Currently optional (or for testing)
 def Blink (score, classes, distance):
     try:
         while True:
-            if (score >= 0.50 and classes == 77 and distance < 45):
-                print("\nObstacle detected, stop!\n")
-
-                a.digitalWrite(LED, a.LOW)  # High = on, LOW = off
-                sleep(0.05) #in Arduino IDE, this is equivalent to 'delay'
-                a.digitalWrite(LED,a.HIGH)
-                sleep(0.05)
-                a.digitalWrite(LED, a.LOW)  # High = on, LOW = off
-                sleep(0.05) #in Arduino IDE, this is equivalent to 'delay'
-                a.digitalWrite(LED,a.HIGH)
-                sleep(0.05)
-                break
-            elif (score >= 0.50 and classes == 75 and distance < 45):
-                print("\nObstacle detected, stop!\n")
-
-                a.digitalWrite(LED, a.LOW)  # High = on, LOW = off
-                sleep(0.05) #in Arduino IDE, this is equivalent to 'delay'
-                a.digitalWrite(LED,a.HIGH)
-                sleep(0.05)
-                a.digitalWrite(LED, a.LOW)  # High = on, LOW = off
-                sleep(0.05) #in Arduino IDE, this is equivalent to 'delay'
-                a.digitalWrite(LED,a.HIGH)
-                sleep(0.05)
-                break
-            elif (score >= 0.50 and classes == 76 and distance < 45):
-                print("\nObstacle detected, stop!\n")
+            if (score >= 0.50 and classes == 77 or distance < 45):
+                print("\nPerson detected, stop!\n")
 
                 a.digitalWrite(LED, a.LOW)  # High = on, LOW = off
                 sleep(0.05) #in Arduino IDE, this is equivalent to 'delay'
@@ -115,27 +95,25 @@ def Blink (score, classes, distance):
                 break
 
             else:
-                print("\nNo obstacle is detected : Continue\n")
+                print("\nNo person is detected : Continue\n")
                 a.digitalWrite(LED, a.LOW)  # High = gerak, LOW = stop                
                 break
     except:
         a.digitalWrite(LED, a.LOW)
-        print("\nWaiting for start instruction...\n")
+        print("\nOops. Something went wrong. LED is turned off to avoid damages.\n")
         
 def Terminate ():
-    a.digitalWrite(M1, a.LOW)
-    a.digitalWrite(M2, a.LOW)
-    a.analogWrite(E1, 0)
-    a.analogWrite(E2,0)
-    print("\nModel stopped moving.\n")
-
-def Start ():
-    a.digitalWrite(M1, a.HIGH)
-    a.digitalWrite(M2, a.HIGH)
-    a.analogWrite(E1, 140)
-    a.analogWrite(E2, 145)
-    print("\nModel start moving.\n")
-    
+    try:
+        a.digitalWrite(M1, a.LOW)
+        a.digitalWrite(M2, a.LOW)
+        a.analogWrite(E1, 0)
+        a.analogWrite(E2,0)
+        
+        print("\nProgram is terminated.\n")
+        
+            
+    except:
+        print("\nOops. Something went wrong.\n")
 
 
 

@@ -18,7 +18,7 @@ All I did was add Arduiono_Movements functions that stop or move according to th
 '''
 
 # Import packages
-import Arduino_Movements as AM
+import Arduino_Movements_v4 as AM
 import os
 import cv2
 import numpy as np
@@ -84,7 +84,8 @@ num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 frame_rate_calc = 1
 freq = cv2.getTickFrequency()
 font = cv2.FONT_HERSHEY_SIMPLEX
-
+BUTTON_START = 0 ## Button for initializing first movement
+est_dist = 0
 
 if camera_type == 'picamera':
     camera = PiCamera()
@@ -96,7 +97,6 @@ if camera_type == 'picamera':
     for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
 
         t1 = cv2.getTickCount()
-        
         # Acquire frame and expand frame dimensions to have shape: [1, None, None, 3]
         # i.e. a single-column array, where each item in the column has the pixel RGB value
         frame = np.copy(frame1.array)
@@ -111,20 +111,16 @@ if camera_type == 'picamera':
         conf_score = np.squeeze(scores).astype(np.float32)[0]
         class_detect = np.squeeze(classes).astype(np.int32)[0]
         coordinates = np.squeeze(boxes).astype(np.float32)[0]
-        ymin = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[0]
         xmin = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[1]
-        ymax = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[2]
         xmax = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[3]
+        app_width = abs(xmax*IM_WIDTH - xmin*IM_WIDTH) ## Apparent width calculations
+        est_dist = (587.1616 * 7.5)/(app_width) ## Triangle similarity with pixel coordination
 
-        print("Scores : ", conf_score)
+        print("Scores : ", conf_score*100)
         print("Classes : ", class_detect)
-        print("Bounding Box coordinate : ", ymin, xmin, ymax,xmax)
-        #print("Score list : ", scores)
-        #print("Classes list : ", classes)
-        #print("Full list: ", boxes)
-        #print("Dunno what this is", num)
+        print("Bounding Box coordinate : ",xmin, xmax)
+        print("Distance tp object (cm): ", est_dist)
       
-
         # Draw the results of the detection (aka 'visualize the results')
         vis_util.visualize_boxes_and_labels_on_image_array(
             frame,
@@ -140,17 +136,26 @@ if camera_type == 'picamera':
 
         # All the results have been drawn on the frame, so it's time to display it.
         cv2.imshow('Object detector', frame)
-        if cv2.waitKey(1) == ord('m'):
-            AM.Movements(conf_score,class_detect)
+
+        k = cv2.waitKey(1)
+        
+        if (k == ord('s') and BUTTON_START==0):
+            AM.Start()
+            BUTTON_START = -1
+        elif (BUTTON_START !=0):
+            BUTTON_START = AM.Movements(conf_score,class_detect, est_dist, BUTTON_START) ## Decision-making
+            #AM.Blink(conf_score,class_detect, est_dist)	## Decision-making
+        if (k == ord('q')):
+            BUTTON_START = AM.Terminate(BUTTON_START)
+            break
+        if (k == ord('h') or BUTTON_START==100):
+            BUTTON_START = AM.Terminate(BUTTON_START)
+            BUTTON_START=0
+        print("\nBUTTON START 1 = ",BUTTON_START) 
         t2 = cv2.getTickCount()
         time1 = (t2-t1)/freq
-        frame_rate_calc = 1/time1
+        frame_rate_calc = 1/time1 
 
-        # Press 'q' to quit
-        if cv2.waitKey(1) == ord('q'):
-            AM.Terminate()
-            break
-        
         rawCapture.truncate(0)
 
     camera.close()

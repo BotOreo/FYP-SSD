@@ -18,7 +18,7 @@ All I did was add Arduiono_Movements functions that stop or move according to th
 '''
 
 # Import packages
-import Arduino_Movements as AM
+import Arduino_Movements_v2 as AM
 import os
 import cv2
 import numpy as np
@@ -115,6 +115,8 @@ if camera_type == 'picamera':
         xmin = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[1]
         ymax = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[2]
         xmax = np.squeeze(boxes).astype(np.float32)[0].astype(np.float32)[3]
+        app_width = abs(xmax*IM_WIDTH - xmin*IM_WIDTH) ## Apparent width calculations
+        est_dist = (668.544 * 7.5)/app_width ## Triangle similarity with pixel coordination
 
         print("Scores : ", conf_score)
         print("Classes : ", class_detect)
@@ -140,8 +142,8 @@ if camera_type == 'picamera':
 
         # All the results have been drawn on the frame, so it's time to display it.
         cv2.imshow('Object detector', frame)
-        if cv2.waitKey(1) == ord('m'):
-            AM.Movements(conf_score,class_detect)
+        AM.Movements(conf_score,class_detect, est_dist) ## Decision-making
+        AM.Blink(conf_score,class_detect, est_dist)	## Decision-making
         t2 = cv2.getTickCount()
         time1 = (t2-t1)/freq
         frame_rate_calc = 1/time1

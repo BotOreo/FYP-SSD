@@ -1,6 +1,6 @@
 '''
 Name : Muhamad Arif Lutfi bin Aziz
-Date : 10th November 2019
+Date : 7th December 2019
 
 This python script is used as an import function in another file for Arduino-Pi series using Nanpy
 Currently it is succesful but only coded just for my FYP (10th November 2019).
@@ -39,29 +39,55 @@ M1 = 4 #For the wheel  #5
 E2 = 6 #7
 M2 = 7 #For the wheel #6
 LED = 13
+##0  black, 1 white
+
+sensorR = 14
+sensorL = 15
 
 a.pinMode(M1, a.OUTPUT)
 a.pinMode(M2, a.OUTPUT)
 a.pinMode(LED, a.OUTPUT)
 a.pinMode(E1, a.OUTPUT)
 a.pinMode(E2, a.OUTPUT)
+a.pinMode(sensorR, a.INPUT)
+a.pinMode(sensorL, a.INPUT)
 
 
-## This part of the function is for wheel movement
-def Movements (score, classes, distance):
+## This part of the function is for wheel movementq
+def Movements (score, classes, distance, permaStop):
     try:
         while True:
-            if (score >= 0.50 and classes == 77 and distance < 35):
+            if (score >= 0.50 and classes == 75 and distance <= 15):
+                print("\nMAMAMAMAMA detected, stop!\n")
+                permaStop = Terminate(permaStop)
+                permaStop = 100
+                print("\nBUTTON START 2 = ",permaStop)
+                return  permaStop
+                break
+            elif (score >= 0.50 and classes == 76 and distance <= 15):
+                print("\nMMAMAMAMAle detected, stop!\n")
+                permaStop = Terminate(permaStop)
+                permaStop = 100
+                print("\nBUTTON START 2 = ",permaStop)
+                return  permaStop
+                break
+            elif (score >= 0.50 and classes == 77 and distance <= 15):
+                print("\nMAMAMAMAAM detected, stop!\n")
+                permaStop = Terminate(permaStop)
+                print("\nBUTTON START 2 = ",permaStop)
+                return  permaStop
+                break
+            elif (score >= 0.50 and classes == 77 and distance < 35):
                 print("\nObstacle detected, stop!\n")
-                Terminate()
+                permaStop = Terminate(permaStop)
                 break
             elif (score >= 0.50 and classes == 75 and distance < 35):
                 print("\nObstacle detected, stop!\n")
-                Terminate()
+                permaStop = Terminate(permaStop)
                 break
             elif (score >= 0.50 and classes == 76 and distance < 35):
                 print("\nObstacle detected, stop!\n")
-                Terminate()
+                permaStop = Terminate(permaStop)
                 break
             else:
                 print("\nNo obstacle is detected : Continue\n")
@@ -122,20 +148,41 @@ def Blink (score, classes, distance):
         a.digitalWrite(LED, a.LOW)
         print("\nWaiting for start instruction...\n")
         
-def Terminate ():
+def Terminate (permaStop):
     a.digitalWrite(M1, a.LOW)
     a.digitalWrite(M2, a.LOW)
     a.analogWrite(E1, 0)
     a.analogWrite(E2,0)
+    permaStop = 100
+    print("\nBUTTON START 3 = ",permaStop)
     print("\nModel stopped moving.\n")
+    return permaStop
 
 def Start ():
     a.digitalWrite(M1, a.HIGH)
     a.digitalWrite(M2, a.HIGH)
-    a.analogWrite(E1, 140)
-    a.analogWrite(E2, 145)
+    a.analogWrite(E1, 110)
+    a.analogWrite(E2,95)
+    val_R = a.digitalRead(sensorR)
+    val_L = a.digitalRead(sensorL)
     print("\nModel start moving.\n")
+    PathCorrector(val_R, val_L)
     
+def PathCorrector(val_R, val_L):
 
-
-
+    if(val_R == 0 and val_L == 1): ##if statement for turn left
+        a.digitalWrite(M2, a.HIGH)
+        a.analogWrite(E2, 200)
+        #sleep(0.5)
+        #break
+    elif(val_R == 1 and val_L == 0): ##if statement for turn right
+        a.digitalWrite(M1, a.HIGH)
+        a.analogWrite(E1, 190)
+        #sleep(0.5)
+        #break
+    else:
+        a.digitalWrite(M2, a.HIGH)
+        a.analogWrite(E2, 170)
+        a.digitalWrite(M1, a.HIGH)
+        a.analogWrite(E1, 170)
+    
